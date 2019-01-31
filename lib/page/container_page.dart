@@ -81,6 +81,7 @@ class _JiContainerPageState extends State<JiContainerPage>
               }
             },
             itemCount: 4,
+            physics: NeverScrollableScrollPhysics(),
           ),
           bottomNavigationBar: JiBottomBar(
               backgroundColor: Colors.transparent,

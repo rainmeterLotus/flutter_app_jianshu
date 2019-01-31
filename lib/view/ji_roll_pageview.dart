@@ -3,31 +3,33 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
-class JiRollPageView extends StatefulWidget{
+class JiRollPageView extends StatefulWidget {
   final List<String> listUrl;
+
   JiRollPageView(this.listUrl);
 
   @override
   State<StatefulWidget> createState() {
     return _JiRollPageViewState();
   }
-
 }
 
 const timeout = const Duration(seconds: 2);
-class _JiRollPageViewState extends State<JiRollPageView> with SingleTickerProviderStateMixin{
 
+class _JiRollPageViewState extends State<JiRollPageView>
+    with SingleTickerProviderStateMixin {
   PageController _pageController;
   TabController _tabController;
   Timer _timer;
-  int _index=0;
-  
+  int _index = 0;
+  bool _isEndScroll = true;
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     _pageController = PageController();
-    _tabController = TabController(length: widget.listUrl.length,vsync: this);
+    _tabController = TabController(length: widget.listUrl.length, vsync: this);
     _timer = Timer.periodic(const Duration(seconds: 5), _handleTimer);
   }
 
@@ -43,9 +45,11 @@ class _JiRollPageViewState extends State<JiRollPageView> with SingleTickerProvid
   @override
   Widget build(BuildContext context) {
     List<Widget> childList = [];
-    for(int i=0 ;i<widget.listUrl.length;i++){
-      childList.add(_getImageByUrl(widget.listUrl[i],MediaQuery.of(context).size.width,MediaQuery.of(context).size.width * 0.2)
-      );
+    for (int i = 0; i < widget.listUrl.length; i++) {
+      childList.add(_getImageByUrl(
+          widget.listUrl[i],
+          MediaQuery.of(context).size.width,
+          MediaQuery.of(context).size.width * 0.2));
     }
 
     return Stack(
@@ -54,12 +58,24 @@ class _JiRollPageViewState extends State<JiRollPageView> with SingleTickerProvid
         Container(
           width: MediaQuery.of(context).size.width,
           height: MediaQuery.of(context).size.width * 0.2,
-          child: PageView(
-            controller: _pageController,
-            onPageChanged: (index){
-              _onPageChanged(index);
+          child: NotificationListener(
+            child: PageView(
+              controller: _pageController,
+              onPageChanged: (index) {
+                _onPageChanged(index);
+              },
+              children: childList,
+            ),
+            onNotification: (ScrollNotification scrollInfo) {
+              if (scrollInfo is ScrollEndNotification ||
+                  scrollInfo is UserScrollNotification) {
+                _isEndScroll = true;
+              } else {
+                _isEndScroll = false;
+              }
+
+              return false;
             },
-            children: childList,
           ),
         ),
         Align(
@@ -74,27 +90,24 @@ class _JiRollPageViewState extends State<JiRollPageView> with SingleTickerProvid
     );
   }
 
-
   _onPageChanged(int index) {
-    print("====_onPageChanged====$index");
     _index = index;
     _tabController.animateTo(index);
   }
 
+  _handleTimer(Timer timer) {
+    if (_isEndScroll) {
+      _index++;
+      var toPage = _index % widget.listUrl.length;
+      _pageController.animateToPage(toPage,
+          duration: Duration(milliseconds: 16), curve: Curves.fastOutSlowIn);
 
-  _handleTimer(Timer timer){
-    _index ++;
-    var toPage = _index % widget.listUrl.length;
-    print("====_handleTimer====$_index");
-    print("====_handleTimer====$toPage");
-    _pageController.animateToPage(toPage, duration: Duration(milliseconds: 16), curve: Curves.fastOutSlowIn);
-
-    _tabController.animateTo(toPage);
+      _tabController.animateTo(toPage);
+    }
   }
 
-
-  Widget _getImageByUrl(String url,double widthItem,double heightItem){
-    if(url == null || url == ""){
+  Widget _getImageByUrl(String url, double widthItem, double heightItem) {
+    if (url == null || url == "") {
       return null;
     }
 
@@ -103,7 +116,8 @@ class _JiRollPageViewState extends State<JiRollPageView> with SingleTickerProvid
       width: widthItem,
       height: heightItem,
     );
-    return  CachedNetworkImage(
+
+    return CachedNetworkImage(
         imageUrl: url,
         placeholder: placeHolder,
         errorWidget: placeHolder,
@@ -111,6 +125,4 @@ class _JiRollPageViewState extends State<JiRollPageView> with SingleTickerProvid
         height: heightItem,
         fit: BoxFit.fill);
   }
-
-
 }

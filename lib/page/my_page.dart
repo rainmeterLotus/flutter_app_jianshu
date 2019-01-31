@@ -22,7 +22,7 @@ class _JiMyPageState extends State<JiMyPage> {
             _createTopBar(),
             Expanded(
               child: TabBarView(children: <Widget>[
-                _crateBody(),
+                _createBody(),
               ]),
             )
           ],
@@ -37,7 +37,7 @@ class _JiMyPageState extends State<JiMyPage> {
     );
   }
 
-  Widget _crateBody() {
+  Widget _createBody() {
     var container = Container(
       padding: EdgeInsets.only(left: 16, right: 16),
       child: Column(
@@ -45,7 +45,7 @@ class _JiMyPageState extends State<JiMyPage> {
           _createHead(),
           _createCard(),
           SizedBox(height: 20,),
-          _crateBanner()
+          _createBanner()
         ],
       ),
     );
@@ -59,7 +59,7 @@ class _JiMyPageState extends State<JiMyPage> {
     );
   }
 
-  Widget _crateBanner(){
+  Widget _createBanner(){
     List<String> bannerList =[];
     bannerList.add("https://timgsa.baidu.com/timg?image&quality=80&size=b9999_10000&sec=1547284268765&di=762d3212ae40b93dbfee4d4f4c4699d8&imgtype=0&src=http%3A%2F%2Fimg4.duitang.com%2Fuploads%2Fblog%2F201403%2F20%2F20140320140221_VrFTt.thumb.700_0.jpeg");
     bannerList.add("https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=833982181,3967302085&fm=26&gp=0.jpg");
